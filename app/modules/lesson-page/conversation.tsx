@@ -3,7 +3,7 @@ import {
   type RenderedComment,
 } from "~/components/comment-thread";
 import { Card } from "~/components/ui/card";
-import { LessonNoteEditor } from "./lib/lesson-note-editor";
+import { LessonNoteEditor, type LessonNote } from "./lib/lesson-note-editor";
 
 export function LessonConversation({
   lessonId,
@@ -14,7 +14,7 @@ export function LessonConversation({
   instructorName,
 }: {
   lessonId: number;
-  note: { body: string; updatedAt: string } | null;
+  note: LessonNote | null;
   comments: RenderedComment[];
   currentUserId: number | null;
   canModerate: boolean;
