@@ -1,9 +1,26 @@
+import { NotebookPen } from "lucide-react";
 import {
   CommentThread,
   type RenderedComment,
 } from "~/components/comment-thread";
+import { Button } from "~/components/ui/button";
 import { Card } from "~/components/ui/card";
-import { LessonNoteEditor, type LessonNote } from "./lib/lesson-note-editor";
+import {
+  LessonNoteEditor,
+  lessonNoteEditorId,
+  type LessonNote,
+} from "./lib/lesson-note-editor";
+
+export function LessonNotesLink() {
+  return (
+    <Button asChild variant="outline" size="sm">
+      <a href={`#${lessonNoteEditorId}`}>
+        <NotebookPen aria-hidden="true" />
+        Your notes
+      </a>
+    </Button>
+  );
+}
 
 export function LessonConversation({
   lessonId,

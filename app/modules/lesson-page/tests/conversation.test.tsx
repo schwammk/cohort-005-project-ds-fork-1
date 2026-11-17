@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { describe, expect, it } from "vitest";
-import { LessonConversation } from "../conversation";
+import { LessonConversation, LessonNotesLink } from "../conversation";
 
 const savedNote = {
   body: "Review cursor pagination.",
@@ -16,14 +16,17 @@ function renderConversation(
     {
       path: "/",
       element: (
-        <LessonConversation
-          lessonId={30}
-          currentUserId={currentUserId}
-          note={note}
-          comments={[]}
-          canModerate={false}
-          instructorName="Marcus Johnson"
-        />
+        <>
+          {currentUserId !== null && <LessonNotesLink />}
+          <LessonConversation
+            lessonId={30}
+            currentUserId={currentUserId}
+            note={note}
+            comments={[]}
+            canModerate={false}
+            instructorName="Marcus Johnson"
+          />
+        </>
       ),
     },
   ]);
@@ -60,8 +63,22 @@ describe("lesson conversation", () => {
       'placeholder="Jot down a takeaway or something to revisit…"'
     );
     expect(editor).toContain(`aria-labelledby="${titleId}"`);
-    expect(editor).toContain(`aria-describedby="${privacyId}"`);
+    const descriptionIds = editor
+      ?.match(/aria-describedby="([^"]+)"/)?.[1]
+      .split(" ");
+    expect(descriptionIds).toHaveLength(2);
+    expect(descriptionIds?.[0]).toBe(privacyId);
+    expect(descriptionIds?.[1]).toBeTruthy();
+    expect(html).toContain(`id="${descriptionIds?.[1]}"`);
     expect(html).not.toContain("Last edited");
+  });
+
+  it("links directly to the editable note field", () => {
+    const html = renderConversation(1);
+    const targetId = html.match(/<a\b[^>]*href="#([^"\s]+)"/)?.[1];
+    expect(targetId).toBeTruthy();
+    const editor = html.match(/<textarea[^>]*name="body"[^>]*>/)?.[0];
+    expect(editor).toContain(`id="${targetId}"`);
   });
 
   it("shows Discussion without a note editor when signed out", () => {

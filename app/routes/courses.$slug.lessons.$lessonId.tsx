@@ -3,7 +3,10 @@ import { Link, useFetcher, useNavigate } from "react-router";
 import type { Route } from "./+types/courses.$slug.lessons.$lessonId";
 import { loadLesson } from "~/modules/lesson-page/loader.server";
 import { submitLessonAction } from "~/modules/lesson-page/action.server";
-import { LessonConversation } from "~/modules/lesson-page/conversation";
+import {
+  LessonConversation,
+  LessonNotesLink,
+} from "~/modules/lesson-page/conversation";
 import { CurriculumSidebar } from "~/components/lesson-curriculum-sidebar";
 import { QuizSection } from "~/components/lesson-quiz";
 import { LessonProgressStatus } from "~/db/schema";
@@ -250,7 +253,7 @@ function FullLesson({
         enrolled={enrolled}
       />
 
-      <div className="min-w-0 flex-1 p-3 sm:p-6 lg:p-8">
+      <div className="min-w-0 flex-1 p-6 lg:p-8">
         <LessonBreadcrumb
           course={course}
           mod={mod}
@@ -263,7 +266,7 @@ function FullLesson({
             <h1 className="text-3xl font-bold">{lesson.title}</h1>
             {currentUserId && <BookmarkToggle bookmarked={bookmarked} />}
           </div>
-          <div className="mb-6 flex items-center gap-3">
+          <div className="mb-6 flex flex-wrap items-center gap-3">
             {lesson.durationMinutes && (
               <div className="flex items-center gap-1 text-sm text-muted-foreground">
                 <Clock className="size-4" />
@@ -282,6 +285,7 @@ function FullLesson({
                 </Button>
               </a>
             )}
+            {currentUserId !== null && <LessonNotesLink />}
           </div>
 
           {/* YouTube Video */}

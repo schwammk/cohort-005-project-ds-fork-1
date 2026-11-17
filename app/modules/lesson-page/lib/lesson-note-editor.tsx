@@ -6,26 +6,25 @@ import { Textarea } from "~/components/ui/textarea";
 import { formatRelativeTime } from "~/lib/utils";
 
 export type LessonNote = { body: string; updatedAt: string };
+export const lessonNoteEditorId = "lesson-note";
 
 function NoteStatus({
-  id,
   error,
   updatedAt,
 }: {
-  id: string;
   error?: string;
   updatedAt?: string;
 }) {
   if (error) {
     return (
-      <p id={id} role="alert" className="mr-auto text-sm text-destructive">
+      <p role="alert" className="text-sm text-destructive">
         {error}
       </p>
     );
   }
 
   return (
-    <output className="mr-auto text-xs text-muted-foreground">
+    <output className="text-xs text-muted-foreground">
       {updatedAt && (
         <time dateTime={updatedAt} suppressHydrationWarning>
           Last edited {formatRelativeTime(updatedAt)}
@@ -39,7 +38,7 @@ export function LessonNoteEditor({ note }: { note: LessonNote | null }) {
   const idPrefix = useId();
   const titleId = `${idPrefix}-title`;
   const privacyId = `${idPrefix}-privacy`;
-  const errorId = `${idPrefix}-error`;
+  const statusId = `${idPrefix}-status`;
   const fetcher = useFetcher<{ ok: boolean; error?: string }>();
   const isSaving = fetcher.state !== "idle";
   const error = isSaving ? undefined : fetcher.data?.error;
@@ -65,16 +64,19 @@ export function LessonNoteEditor({ note }: { note: LessonNote | null }) {
       <fetcher.Form method="post" className="space-y-3">
         <input type="hidden" name="intent" value="save-note" />
         <Textarea
+          id={lessonNoteEditorId}
           name="body"
           aria-labelledby={titleId}
-          aria-describedby={error ? `${privacyId} ${errorId}` : privacyId}
+          aria-describedby={`${privacyId} ${statusId}`}
           aria-invalid={error ? true : undefined}
           defaultValue={note?.body ?? ""}
           placeholder="Jot down a takeaway or something to revisit…"
-          className="max-h-80 min-h-24 resize-y bg-background dark:bg-background"
+          className="min-h-24 resize-y bg-background dark:bg-background"
         />
         <div className="flex flex-wrap items-center justify-end gap-x-3 gap-y-2">
-          <NoteStatus id={errorId} error={error} updatedAt={note?.updatedAt} />
+          <div id={statusId} className="mr-auto">
+            <NoteStatus error={error} updatedAt={note?.updatedAt} />
+          </div>
           <Button type="submit" size="sm" disabled={isSaving}>
             {isSaving ? "Saving…" : "Save note"}
           </Button>
